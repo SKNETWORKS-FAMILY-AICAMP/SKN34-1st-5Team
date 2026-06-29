@@ -20427,7 +20427,8 @@
 							},
 							"name": "region_code",
 							"type": "region",
-							"length": 0
+							"length": 0,
+							"foreignKey": true
 						},
 						{
 							"_type": "ERDColumn",
