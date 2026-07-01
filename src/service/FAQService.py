@@ -5,7 +5,7 @@ import csv
 from src.type.faq_item import FAQItem
 from src.type.manufacturer import Manufacturer
 from src.type.page import Page
-from src.repository.repository import find_faq, create_faq
+from src.repository.repository import Repository
 
 
 def get_faq(page: int, size: int, manufacturer: Manufacturer) -> Page:
@@ -19,10 +19,14 @@ def get_faq(page: int, size: int, manufacturer: Manufacturer) -> Page:
         조회된 FAQ 목록과 페이지 정보를 담은 Page 객체
     """
 
+    db = Repository()
+    
+
     category = manufacturer.value
     sub_category = page
+    
 
-    faq_items: list[FAQItem] = find_faq(category=category, sub_category=sub_category)
+    faq_items: list[FAQItem] = db.find_faq(category=category, sub_category=sub_category)
 
     total_count = len(faq_items)
     total_page = (total_count + size -1) // size if size > 0 else 0
