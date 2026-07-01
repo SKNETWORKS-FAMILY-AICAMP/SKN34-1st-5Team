@@ -309,6 +309,19 @@ class Repository:
         finally:
             cursor.close()
 
+    def find_city(self, region: Region) -> list[str]:
+        """시도에 속한 시/군/구 목록을 조회한다."""
+        conn = self.get_connection()
+        cursor = conn.cursor(dictionary=True)
+        try:
+            cursor.execute(
+                "SELECT city_name FROM v_city_by_region WHERE region_name = %s",
+                (region.value,),
+            )
+            return [row["city_name"] for row in cursor.fetchall()]
+        finally:
+            cursor.close()
+
     def find_population_by_region(self, region: Region) -> RegionEVStats:
         """지역별 인구수 통계를 조회한다."""
         pass

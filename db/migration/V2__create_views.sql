@@ -154,7 +154,19 @@ LEFT JOIN ev_registration  AS er ON er.region_id = r.id
 LEFT JOIN ev_adoption_rate AS ea ON ea.region_id = r.id;
 
 
--- ── 10. FAQ 통합 ─────────────────────────────────────────────
+-- ── 10. 시도별 시/군/구 목록 ──────────────────────────────────
+--  용도: 시도에 속한 시/군/구 목록 조회 (LocationService)
+--  시도명, 시/군/구명
+
+CREATE VIEW v_city_by_region AS
+SELECT
+    r.name AS region_name,
+    c.name AS city_name
+FROM      city   AS c
+JOIN      region AS r ON c.region_id = r.id;
+
+
+-- ── 11. FAQ 통합 ─────────────────────────────────────────────
 --  용도: FAQ 검색 및 조회 (FAQ 페이지)
 --  제조사명, 카테고리명, 질문, 답변, 출처 URL
 
