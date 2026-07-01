@@ -1,18 +1,15 @@
--- ============================================================
---  전기차 구매 지원 정보 시스템 DB 스키마
---  참고: docs/다이어그램.mdj, docs/ER다이어그램.svg
--- ============================================================
+-- EV Purchase Support Information System DB Schema
 
--- ── 룩업 테이블 ─────────────────────────────────────────────
+-- Lookup Tables
 
 CREATE TABLE IF NOT EXISTS manufacturer (
-    id   INT          NOT NULL AUTO_INCREMENT,
+    id   INT         NOT NULL AUTO_INCREMENT,
     name VARCHAR(30) NOT NULL UNIQUE,
     PRIMARY KEY (id)
 );
 
 CREATE TABLE IF NOT EXISTS charging_type (
-    id   INT          NOT NULL AUTO_INCREMENT,
+    id   INT         NOT NULL AUTO_INCREMENT,
     name VARCHAR(50) NOT NULL UNIQUE,
     PRIMARY KEY (id)
 );
@@ -41,31 +38,31 @@ CREATE TABLE IF NOT EXISTS city (
 );
 
 CREATE TABLE IF NOT EXISTS faq_category (
-    id       INT          NOT NULL AUTO_INCREMENT,
+    id       INT         NOT NULL AUTO_INCREMENT,
     category VARCHAR(50) NOT NULL UNIQUE,
     PRIMARY KEY (id)
 );
 
--- ── 전기차 ──────────────────────────────────────────────────
+-- Electric Vehicle
 
 CREATE TABLE IF NOT EXISTS electric_vehicle (
-    id                    INT          NOT NULL AUTO_INCREMENT,
-    manufacturer_id       INT          NOT NULL,
+    id                    INT         NOT NULL AUTO_INCREMENT,
+    manufacturer_id       INT         NOT NULL,
     model_name            VARCHAR(50) NOT NULL,
     trim_name             VARCHAR(50),
-    price                 INT NOT NULL,
+    price                 INT         NOT NULL,
     driving_range         FLOAT,
     efficiency            FLOAT,
     slow_charging_type_id INT,
     fast_charging_type_id INT,
     PRIMARY KEY (id),
     UNIQUE KEY uq_vehicle (manufacturer_id, model_name, trim_name),
-    FOREIGN KEY (manufacturer_id)       REFERENCES manufacturer   (id),
-    FOREIGN KEY (slow_charging_type_id) REFERENCES charging_type  (id),
-    FOREIGN KEY (fast_charging_type_id) REFERENCES charging_type  (id)
+    FOREIGN KEY (manufacturer_id)       REFERENCES manufacturer  (id),
+    FOREIGN KEY (slow_charging_type_id) REFERENCES charging_type (id),
+    FOREIGN KEY (fast_charging_type_id) REFERENCES charging_type (id)
 );
 
--- ── 보조금 ──────────────────────────────────────────────────
+-- Subsidy
 
 CREATE TABLE IF NOT EXISTS subsidy (
     id                          INT NOT NULL AUTO_INCREMENT,
@@ -79,10 +76,10 @@ CREATE TABLE IF NOT EXISTS subsidy (
     PRIMARY KEY (id),
     UNIQUE KEY uq_subsidy (electric_vehicle_id, region_id, year),
     FOREIGN KEY (electric_vehicle_id) REFERENCES electric_vehicle (id),
-    FOREIGN KEY (region_id)           REFERENCES region            (id)
+    FOREIGN KEY (region_id)           REFERENCES region           (id)
 );
 
--- ── 충전소 ──────────────────────────────────────────────────
+-- Charging Station
 
 CREATE TABLE IF NOT EXISTS charging_station (
     id               INT          NOT NULL AUTO_INCREMENT,
@@ -102,7 +99,7 @@ CREATE TABLE IF NOT EXISTS charging_station (
     FOREIGN KEY (charging_type_id) REFERENCES charging_type (id)
 );
 
--- ── 정비소 ──────────────────────────────────────────────────
+-- Repair Shop
 
 CREATE TABLE IF NOT EXISTS repair_shop (
     id                  INT          NOT NULL AUTO_INCREMENT,
@@ -122,7 +119,7 @@ CREATE TABLE IF NOT EXISTS repair_shop (
     FOREIGN KEY (repair_shop_type_id) REFERENCES repair_shop_type (id)
 );
 
--- ── FAQ (현대·기아 한정) ─────────────────────────────────────
+-- FAQ
 
 CREATE TABLE IF NOT EXISTS faq (
     id              INT  NOT NULL AUTO_INCREMENT,
@@ -132,11 +129,11 @@ CREATE TABLE IF NOT EXISTS faq (
     answer          TEXT NOT NULL,
     source_url      VARCHAR(500),
     PRIMARY KEY (id),
-    FOREIGN KEY (manufacturer_id) REFERENCES manufacturer  (id),
-    FOREIGN KEY (faq_category_id) REFERENCES faq_category  (id)
+    FOREIGN KEY (manufacturer_id) REFERENCES manufacturer (id),
+    FOREIGN KEY (faq_category_id) REFERENCES faq_category (id)
 );
 
--- ── 시도별 전기차 등록 현황 ──────────────────────────────────
+-- EV Registration by Region
 
 CREATE TABLE IF NOT EXISTS ev_registration (
     id        INT NOT NULL AUTO_INCREMENT,
@@ -148,7 +145,7 @@ CREATE TABLE IF NOT EXISTS ev_registration (
     FOREIGN KEY (region_id) REFERENCES region (id)
 );
 
--- ── 시도별 전기차 보급률 ──────────────────────────────────────
+-- EV Adoption Rate by Region
 
 CREATE TABLE IF NOT EXISTS ev_adoption_rate (
     id            INT   NOT NULL AUTO_INCREMENT,
