@@ -131,25 +131,211 @@ class Repository:
 
     def find_subsidy(self, region: Region, vehicle: ElectricVehicle) -> Subsidy:
         """지역과 차종으로 보조금 정보를 조회한다."""
-        pass
+        conn = self.get_connection()
+        cursor = conn.cursor(dictionary=True)
+        try:
+            cursor.execute(
+                """
+                SELECT *
+                FROM v_subsidy_detail
+                WHERE region_name = %s
+                  AND model_name = %s
+                ORDER BY year DESC
+                LIMIT 1
+                """,
+                (region.value, vehicle.model_name),
+            )
+            row = cursor.fetchone()
+            if row is None:
+                return None
+            subsidy = Subsidy()
+            subsidy.year = row["year"]
+            subsidy.region = region
+            subsidy.electric_vehicle = vehicle
+            subsidy.national_subsidy = row["national_subsidy"]
+            subsidy.local_subsidy = row["local_subsidy"]
+            subsidy.national_conversion_subsidy = row["national_conversion_subsidy"]
+            subsidy.local_conversion_subsidy = row["local_conversion_subsidy"]
+            return subsidy
+        finally:
+            cursor.close()
 
     def create_subsidy(self, subsidy: Subsidy) -> None:
         """보조금 정보를 DB에 저장한다."""
-        pass
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        try:
+            cursor.execute(
+                "SELECT id FROM electric_vehicle WHERE model_name = %s",
+                (subsidy.electric_vehicle.model_name,),
+            )
+            row = cursor.fetchone()
+            if row is None:
+                raise ValueError(f"전기차를 찾을 수 없습니다: {subsidy.electric_vehicle.model_name}")
+            electric_vehicle_id = row[0]
+
+            cursor.execute(
+                "SELECT id FROM region WHERE name = %s",
+                (subsidy.region.value,),
+            )
+            row = cursor.fetchone()
+            if row is None:
+                raise ValueError(f"지역을 찾을 수 없습니다: {subsidy.region.value}")
+            region_id = row[0]
+
+            cursor.execute(
+                """
+                INSERT INTO subsidy (
+                    electric_vehicle_id, region_id, year,
+                    national_subsidy, local_subsidy,
+                    national_conversion_subsidy, local_conversion_subsidy
+                )
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
+                """,
+                (
+                    electric_vehicle_id,
+                    region_id,
+                    subsidy.year,
+                    subsidy.national_subsidy,
+                    subsidy.local_subsidy,
+                    subsidy.national_conversion_subsidy,
+                    subsidy.local_conversion_subsidy,
+                ),
+            )
+            conn.commit()
+        finally:
+            cursor.close()
 
     def find_all_vehicle(self) -> list[ElectricVehicle]:
         """전기차 전체 목록을 조회한다."""
-        pass
+        conn = self.get_connection()
+        cursor = conn.cursor(dictionary=True)
+        try:
+            cursor.execute("SELECT * FROM v_electric_vehicle_detail")
+            rows = cursor.fetchall()
+            vehicles = []
+            for row in rows:
+                vehicle = ElectricVehicle()
+                vehicle.manufacturer = row["manufacturer_name"]
+                vehicle.model_name = row["model_name"]
+                vehicle.trim_name = row["trim_name"]
+                vehicle.price = row["price"]
+                vehicle.driving_range = row["driving_range"]
+                vehicle.efficiency = row["efficiency"]
+                vehicle.slow_charging_type = row["slow_charging_type_name"]
+                vehicle.fast_charging_type = row["fast_charging_type_name"]
+                vehicles.append(vehicle)
+            return vehicles
+        finally:
+            cursor.close()
 
     def create_vehicle(self, vehicle: ElectricVehicle) -> None:
         """전기차 정보를 DB에 저장한다."""
-        pass
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        try:
+            cursor.execute(
+                "SELECT id FROM manufacturer WHERE name = %s",
+                (vehicle.manufacturer,),
+            )
+            row = cursor.fetchone()
+            if row is None:
+                raise ValueError(f"제조사를 찾을 수 없습니다: {vehicle.manufacturer}")
+            manufacturer_id = row[0]
+
+            cursor.execute(
+                "SELECT id FROM charging_type WHERE name = %s",
+                (vehicle.slow_charging_type,),
+            )
+            row = cursor.fetchone()
+            slow_charging_type_id = row[0] if row else None
+
+            cursor.execute(
+                "SELECT id FROM charging_type WHERE name = %s",
+                (vehicle.fast_charging_type,),
+            )
+            row = cursor.fetchone()
+            fast_charging_type_id = row[0] if row else None
+
+            cursor.execute(
+                """
+                INSERT INTO electric_vehicle (
+                    manufacturer_id, model_name, trim_name,
+                    price, driving_range, efficiency,
+                    slow_charging_type_id, fast_charging_type_id
+                )
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                """,
+                (
+                    manufacturer_id,
+                    vehicle.model_name,
+                    vehicle.trim_name,
+                    vehicle.price,
+                    vehicle.driving_range,
+                    vehicle.efficiency,
+                    slow_charging_type_id,
+                    fast_charging_type_id,
+                ),
+            )
+            conn.commit()
+        finally:
+            cursor.close()
 
     def find_ev_count_by_region(self, region: Region) -> RegionEVStats:
         """지역별 전기차 등록대수를 조회한다."""
-        pass
+        conn = self.get_connection()
+        cursor = conn.cursor(dictionary=True)
+        try:
+            cursor.execute(
+                """
+                SELECT region_name, year, ev_count
+                FROM v_ev_registration_by_region
+                WHERE region_name = %s
+                ORDER BY year DESC
+                LIMIT 1
+                """,
+                (region.value,),
+            )
+            row = cursor.fetchone()
+            if row is None:
+                return None
+            return RegionEVStats(
+                electric_vehicle_count=row["ev_count"],
+                population=0,
+                region=region,
+                year=row["year"],
+                base_date=str(row["year"]),
+            )
+        finally:
+            cursor.close()
 
     def find_population_by_region(self, region: Region) -> RegionEVStats:
-        """지역별 인구 통계를 조회한다."""
+        """지역별 인구수 통계를 조회한다."""
         pass
+
+    def find_adoption_rate_by_region(self, region: Region) -> RegionEVStats:
+        """지역별 전기차 보급률 통계를 조회한다."""
+        conn = self.get_connection()
+        cursor = conn.cursor(dictionary=True)
+        try:
+            cursor.execute(
+                """
+                SELECT region_name, adoption_rate
+                FROM v_adoption_rate_by_region
+                WHERE region_name = %s
+                """,
+                (region.value,),
+            )
+            row = cursor.fetchone()
+            if row is None:
+                return None
+            return RegionEVStats(
+                electric_vehicle_count=0,
+                population=row["adoption_rate"],
+                region=region,
+                year=0,
+                base_date="",
+            )
+        finally:
+            cursor.close()
 
