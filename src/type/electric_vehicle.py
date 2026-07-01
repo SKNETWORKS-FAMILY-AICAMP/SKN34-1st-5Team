@@ -11,4 +11,3 @@ class ElectricVehicle:
         self.efficiency: float
         self.slow_charging_type: ChargingType
         self.fast_charging_type: ChargingType
-
