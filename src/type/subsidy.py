@@ -5,7 +5,7 @@ class Subsidy:
     def __init__(self):
         self.year: int
         self.region: Region
-        self.electric_vehicle: ElectricVehicle()
+        self.electric_vehicle: ElectricVehicle
         self.national_subsidy: int
         self.local_subsidy: int
         self.national_conversion_subsidy: int
