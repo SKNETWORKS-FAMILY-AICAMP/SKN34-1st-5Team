@@ -338,16 +338,17 @@ class Repository:
         finally:
             cursor.close()
 
-    def find_city(self, region: Region) -> list[str]:
-        """시도에 속한 시/군/구 목록을 조회한다."""
+    def find_city(self, region: Region, city: str) -> str | None:
+        """시도와 시/군/구명으로 도시를 조회한다."""
         conn = self.get_connection()
         cursor = conn.cursor(dictionary=True)
         try:
             cursor.execute(
-                "SELECT city_name FROM v_city_by_region WHERE region_name = %s",
-                (region.value,),
+                "SELECT city_name FROM v_city_by_region WHERE region_name = %s AND city_name = %s",
+                (region.value, city),
             )
-            return [row["city_name"] for row in cursor.fetchall()]
+            row = cursor.fetchone()
+            return row["city_name"] if row else None
         finally:
             cursor.close()
 
@@ -355,14 +356,14 @@ class Repository:
         """지역별 인구수 통계를 조회한다."""
         pass
 
-    def find_charging_station(self, region: Region) -> list:
-        """지역별 충전소 목록을 조회한다."""
+    def find_charging_station(self, region: Region, city: str) -> list[ChargingStation]:
+        """지역과 도시로 충전소 목록을 조회한다."""
         conn = self.get_connection()
         cursor = conn.cursor(dictionary=True)
         try:
             cursor.execute(
-                "SELECT * FROM v_charging_station_map WHERE region_name = %s",
-                (region.value,),
+                "SELECT * FROM v_charging_station_map WHERE region_name = %s AND city_name = %s",
+                (region.value, city),
             )
             rows = cursor.fetchall()
             result = []
@@ -441,14 +442,14 @@ class Repository:
         finally:
             cursor.close()
 
-    def find_repair_shop(self, region: Region) -> list:
-        """지역별 정비소 목록을 조회한다."""
+    def find_repair_shop(self, region: Region, city: str) -> list[RepairShop]:
+        """지역과 도시로 정비소 목록을 조회한다."""
         conn = self.get_connection()
         cursor = conn.cursor(dictionary=True)
         try:
             cursor.execute(
-                "SELECT * FROM v_repair_shop_map WHERE region_name = %s",
-                (region.value,),
+                "SELECT * FROM v_repair_shop_map WHERE region_name = %s AND city_name = %s",
+                (region.value, city),
             )
             rows = cursor.fetchall()
             result = []
