@@ -13477,7 +13477,7 @@
 											"font": "Arial;13;0",
 											"parentStyle": true,
 											"left": 1141,
-											"top": 893,
+											"top": 989,
 											"width": 511,
 											"height": 13,
 											"text": "«singleton»"
@@ -13491,7 +13491,7 @@
 											"font": "Arial;13;1",
 											"parentStyle": true,
 											"left": 1141,
-											"top": 908,
+											"top": 1004,
 											"width": 511,
 											"height": 13,
 											"text": "FAQService"
@@ -13506,7 +13506,7 @@
 											"font": "Arial;13;0",
 											"parentStyle": true,
 											"left": -520,
-											"top": -688,
+											"top": -496,
 											"width": 131.841796875,
 											"height": 13,
 											"text": "(from 서비스)"
@@ -13521,7 +13521,7 @@
 											"font": "Arial;13;0",
 											"parentStyle": true,
 											"left": -520,
-											"top": -688,
+											"top": -496,
 											"height": 13,
 											"horizontalAlignment": 1
 										}
@@ -13529,7 +13529,7 @@
 									"font": "Arial;13;0",
 									"parentStyle": true,
 									"left": 1136,
-									"top": 888,
+									"top": 984,
 									"width": 521,
 									"height": 38,
 									"stereotypeLabel": {
@@ -13557,7 +13557,7 @@
 									"font": "Arial;13;0",
 									"parentStyle": true,
 									"left": 1136,
-									"top": 926,
+									"top": 1022,
 									"width": 521,
 									"height": 10
 								},
@@ -13583,7 +13583,7 @@
 											"font": "Arial;13;0",
 											"parentStyle": true,
 											"left": 1141,
-											"top": 941,
+											"top": 1037,
 											"width": 511,
 											"height": 13,
 											"text": "+get_faq(page: int, size: int, manufacturer: Manufacturer): FAQitem",
@@ -13601,7 +13601,7 @@
 											"font": "Arial;13;0",
 											"parentStyle": true,
 											"left": 1141,
-											"top": 956,
+											"top": 1052,
 											"width": 511,
 											"height": 13,
 											"text": "+set_faq(file_path: str)",
@@ -13611,7 +13611,7 @@
 									"font": "Arial;13;0",
 									"parentStyle": true,
 									"left": 1136,
-									"top": 936,
+									"top": 1032,
 									"width": 521,
 									"height": 38
 								},
@@ -13628,7 +13628,7 @@
 									"font": "Arial;13;0",
 									"parentStyle": true,
 									"left": -264,
-									"top": -600,
+									"top": -504,
 									"width": 10,
 									"height": 10
 								},
@@ -13645,7 +13645,7 @@
 									"font": "Arial;13;0",
 									"parentStyle": true,
 									"left": -264,
-									"top": -600,
+									"top": -504,
 									"width": 10,
 									"height": 10
 								}
@@ -13657,7 +13657,7 @@
 							"parentStyle": false,
 							"containerChangeable": true,
 							"left": 1136,
-							"top": 888,
+							"top": 984,
 							"width": 520,
 							"height": 88,
 							"nameCompartment": {
@@ -13704,8 +13704,8 @@
 											},
 											"font": "Arial;13;0",
 											"parentStyle": true,
-											"left": 1149,
-											"top": 1005,
+											"left": 1133,
+											"top": 853,
 											"width": 511,
 											"height": 13,
 											"text": "«singleton»"
@@ -13718,8 +13718,8 @@
 											},
 											"font": "Arial;13;1",
 											"parentStyle": true,
-											"left": 1149,
-											"top": 1020,
+											"left": 1133,
+											"top": 868,
 											"width": 511,
 											"height": 13,
 											"text": "SubsidyService"
@@ -13733,8 +13733,8 @@
 											"visible": false,
 											"font": "Arial;13;0",
 											"parentStyle": true,
-											"left": -168,
-											"top": -1048,
+											"left": -200,
+											"top": -1352,
 											"width": 131.841796875,
 											"height": 13,
 											"text": "(from 서비스)"
@@ -13748,16 +13748,16 @@
 											"visible": false,
 											"font": "Arial;13;0",
 											"parentStyle": true,
-											"left": -168,
-											"top": -1048,
+											"left": -200,
+											"top": -1352,
 											"height": 13,
 											"horizontalAlignment": 1
 										}
 									],
 									"font": "Arial;13;0",
 									"parentStyle": true,
-									"left": 1144,
-									"top": 1000,
+									"left": 1128,
+									"top": 848,
 									"width": 521,
 									"height": 38,
 									"stereotypeLabel": {
@@ -13784,8 +13784,8 @@
 									},
 									"font": "Arial;13;0",
 									"parentStyle": true,
-									"left": 1144,
-									"top": 1038,
+									"left": 1128,
+									"top": 886,
 									"width": 521,
 									"height": 10
 								},
@@ -13810,8 +13810,8 @@
 											},
 											"font": "Arial;13;0",
 											"parentStyle": true,
-											"left": 1149,
-											"top": 1053,
+											"left": 1133,
+											"top": 901,
 											"width": 511,
 											"height": 13,
 											"text": "+get_subsidy(region: Region, vehicle: ElectricVehicle): Subsidy",
@@ -13828,8 +13828,8 @@
 											},
 											"font": "Arial;13;0",
 											"parentStyle": true,
-											"left": 1149,
-											"top": 1068,
+											"left": 1133,
+											"top": 916,
 											"width": 511,
 											"height": 13,
 											"text": "+set_subsidy(file_path: str)",
@@ -13838,8 +13838,8 @@
 									],
 									"font": "Arial;13;0",
 									"parentStyle": true,
-									"left": 1144,
-									"top": 1048,
+									"left": 1128,
+									"top": 896,
 									"width": 521,
 									"height": 38
 								},
@@ -13855,8 +13855,8 @@
 									"visible": false,
 									"font": "Arial;13;0",
 									"parentStyle": true,
-									"left": -104,
-									"top": -816,
+									"left": -120,
+									"top": -968,
 									"width": 10,
 									"height": 10
 								},
@@ -13872,8 +13872,8 @@
 									"visible": false,
 									"font": "Arial;13;0",
 									"parentStyle": true,
-									"left": -104,
-									"top": -816,
+									"left": -120,
+									"top": -968,
 									"width": 10,
 									"height": 10
 								}
@@ -13884,8 +13884,8 @@
 							"font": "Arial;13;0",
 							"parentStyle": false,
 							"containerChangeable": true,
-							"left": 1144,
-							"top": 1000,
+							"left": 1128,
+							"top": 848,
 							"width": 520,
 							"height": 86,
 							"nameCompartment": {
