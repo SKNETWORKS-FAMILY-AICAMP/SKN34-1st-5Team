@@ -14570,7 +14570,7 @@
 											"top": 1309,
 											"width": 511,
 											"height": 13,
-											"text": "+get_charging_station_by_region(region: Region, city: str): Page",
+											"text": "+get_charging_station_by_region(page: int, size: int, region: Region, city: str): Page",
 											"horizontalAlignment": 0
 										},
 										{
@@ -14588,7 +14588,7 @@
 											"top": 1324,
 											"width": 511,
 											"height": 13,
-											"text": "+get_repair_shop_by_region(region: Region, city: str): Page",
+											"text": "+get_repair_shop_by_region(page: int, size: int, region: Region, city: str): Page",
 											"horizontalAlignment": 0
 										},
 										{
@@ -16637,10 +16637,8 @@
 											"_parent": {
 												"$ref": "AAAAAAGfENNxQcRIUYs="
 											},
-											"name": "region",
-											"type": {
-												"$ref": "AAAAAAGfDjqh7H3V4PI="
-											}
+											"name": "page",
+											"type": "int"
 										},
 										{
 											"_type": "UMLParameter",
@@ -16656,6 +16654,26 @@
 										{
 											"_type": "UMLParameter",
 											"_id": "AAAAAAGfHJGYHELeFEA=",
+											"_parent": {
+												"$ref": "AAAAAAGfENNxQcRIUYs="
+											},
+											"name": "size",
+											"type": "int"
+										},
+										{
+											"_type": "UMLParameter",
+											"_id": "AAAAAAGfHUpTMQpfLDA=",
+											"_parent": {
+												"$ref": "AAAAAAGfENNxQcRIUYs="
+											},
+											"name": "region",
+											"type": {
+												"$ref": "AAAAAAGfDjqh7H3V4PI="
+											}
+										},
+										{
+											"_type": "UMLParameter",
+											"_id": "AAAAAAGfHUpTMgpgWn8=",
 											"_parent": {
 												"$ref": "AAAAAAGfENNxQcRIUYs="
 											},
@@ -16678,10 +16696,8 @@
 											"_parent": {
 												"$ref": "AAAAAAGfENPd8sRS69Q="
 											},
-											"name": "region",
-											"type": {
-												"$ref": "AAAAAAGfDjqh7H3V4PI="
-											}
+											"name": "page",
+											"type": "int"
 										},
 										{
 											"_type": "UMLParameter",
@@ -16697,6 +16713,26 @@
 										{
 											"_type": "UMLParameter",
 											"_id": "AAAAAAGfHJGzhkML8xI=",
+											"_parent": {
+												"$ref": "AAAAAAGfENPd8sRS69Q="
+											},
+											"name": "size",
+											"type": "int"
+										},
+										{
+											"_type": "UMLParameter",
+											"_id": "AAAAAAGfHUpqXgqXrRs=",
+											"_parent": {
+												"$ref": "AAAAAAGfENPd8sRS69Q="
+											},
+											"name": "region",
+											"type": {
+												"$ref": "AAAAAAGfDjqh7H3V4PI="
+											}
+										},
+										{
+											"_type": "UMLParameter",
+											"_id": "AAAAAAGfHUpqXgqY3oc=",
 											"_parent": {
 												"$ref": "AAAAAAGfENPd8sRS69Q="
 											},
