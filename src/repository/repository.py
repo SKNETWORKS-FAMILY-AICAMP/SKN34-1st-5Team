@@ -6,11 +6,14 @@ import mysql.connector
 from dotenv import load_dotenv
 from mysql.connector.connection import MySQLConnection
 
+from src.type.charging_station import ChargingStation
+from src.type.charging_type import ChargingType
 from src.type.electric_vehicle import ElectricVehicle
 from src.type.faq_item import FAQItem
 from src.type.manufacturer import Manufacturer
 from src.type.region import Region
 from src.type.region_EV_stats import RegionEVStats
+from src.type.repair_shop import RepairShop
 from src.type.subsidy import Subsidy
 
 load_dotenv()
@@ -148,15 +151,15 @@ class Repository:
             row = cursor.fetchone()
             if row is None:
                 return None
-            subsidy = Subsidy()
-            subsidy.year = row["year"]
-            subsidy.region = region
-            subsidy.electric_vehicle = vehicle
-            subsidy.national_subsidy = row["national_subsidy"]
-            subsidy.local_subsidy = row["local_subsidy"]
-            subsidy.national_conversion_subsidy = row["national_conversion_subsidy"]
-            subsidy.local_conversion_subsidy = row["local_conversion_subsidy"]
-            return subsidy
+            return Subsidy(
+                year=row["year"],
+                region=region,
+                electric_vehicle=vehicle,
+                national_subsidy=row["national_subsidy"],
+                local_subsidy=row["local_subsidy"],
+                national_conversion_subsidy=row["national_conversion_subsidy"] or 0,
+                local_conversion_subsidy=row["local_conversion_subsidy"] or 0,
+            )
         finally:
             cursor.close()
 
@@ -215,15 +218,16 @@ class Repository:
             rows = cursor.fetchall()
             vehicles = []
             for row in rows:
-                vehicle = ElectricVehicle()
-                vehicle.manufacturer = row["manufacturer_name"]
-                vehicle.model_name = row["model_name"]
-                vehicle.trim_name = row["trim_name"]
-                vehicle.price = row["price"]
-                vehicle.driving_range = row["driving_range"]
-                vehicle.efficiency = row["efficiency"]
-                vehicle.slow_charging_type = row["slow_charging_type_name"]
-                vehicle.fast_charging_type = row["fast_charging_type_name"]
+                vehicle = ElectricVehicle(
+                    manufacturer=Manufacturer(row["manufacturer_name"]),
+                    model_name=row["model_name"],
+                    trim_name=row["trim_name"],
+                    price=row["price"],
+                    driving_range=row["driving_range"],
+                    efficiency=row["efficiency"],
+                    slow_charging_type=ChargingType(row["slow_charging_type_name"]) if row["slow_charging_type_name"] else None,
+                    fast_charging_type=ChargingType(row["fast_charging_type_name"]) if row["fast_charging_type_name"] else None,
+                )
                 vehicles.append(vehicle)
             return vehicles
         finally:
@@ -236,23 +240,23 @@ class Repository:
         try:
             cursor.execute(
                 "SELECT id FROM manufacturer WHERE name = %s",
-                (vehicle.manufacturer,),
+                (vehicle.manufacturer.value,),
             )
             row = cursor.fetchone()
             if row is None:
-                raise ValueError(f"제조사를 찾을 수 없습니다: {vehicle.manufacturer}")
+                raise ValueError(f"제조사를 찾을 수 없습니다: {vehicle.manufacturer.value}")
             manufacturer_id = row[0]
 
             cursor.execute(
                 "SELECT id FROM charging_type WHERE name = %s",
-                (vehicle.slow_charging_type,),
+                (vehicle.slow_charging_type.value,),
             )
             row = cursor.fetchone()
             slow_charging_type_id = row[0] if row else None
 
             cursor.execute(
                 "SELECT id FROM charging_type WHERE name = %s",
-                (vehicle.fast_charging_type,),
+                (vehicle.fast_charging_type.value,),
             )
             row = cursor.fetchone()
             fast_charging_type_id = row[0] if row else None
@@ -308,6 +312,31 @@ class Repository:
             )
         finally:
             cursor.close()
+    
+    def create_ev_count_by_region(self, ev_stats: RegionEVStats) -> None:
+        """지역별 전기차 등록대수를 DB에 저장한다."""
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        try:
+            cursor.execute(
+                "SELECT id FROM region WHERE name = %s",
+                (ev_stats.region.value,),
+            )
+            row = cursor.fetchone()
+            if row is None:
+                raise ValueError(f"지역을 찾을 수 없습니다: {ev_stats.region.value}")
+            region_id = row[0]
+
+            cursor.execute(
+                """
+                INSERT INTO ev_registration (region_id, year, ev_count)
+                VALUES (%s, %s, %s)
+                """,
+                (region_id, ev_stats.year, ev_stats.electric_vehicle_count),
+            )
+            conn.commit()
+        finally:
+            cursor.close()
 
     def find_city(self, region: Region) -> list[str]:
         """시도에 속한 시/군/구 목록을 조회한다."""
@@ -325,6 +354,178 @@ class Repository:
     def find_population_by_region(self, region: Region) -> RegionEVStats:
         """지역별 인구수 통계를 조회한다."""
         pass
+
+    def find_charging_station(self, region: Region) -> list:
+        """지역별 충전소 목록을 조회한다."""
+        conn = self.get_connection()
+        cursor = conn.cursor(dictionary=True)
+        try:
+            cursor.execute(
+                "SELECT * FROM v_charging_station_map WHERE region_name = %s",
+                (region.value,),
+            )
+            rows = cursor.fetchall()
+            result = []
+            for row in rows:
+                cs = ChargingStation()
+                cs.name = row["name"]
+                cs.region = region
+                cs.city = row["city_name"] or ""
+                cs.latitude = row["latitude"]
+                cs.longitude = row["longitude"]
+                cs.available_time = f"{row['start_time']} - {row['close_time']}"
+                cs.contact = row["contact"] or ""
+                cs.charging_type = row["charging_type_name"] or ""
+                result.append(cs)
+            return result
+        finally:
+            cursor.close()
+
+    def create_charging_station(self, charging_station) -> None:
+        """충전소 정보를 DB에 저장한다."""
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        try:
+            cursor.execute(
+                "SELECT id FROM region WHERE name = %s",
+                (charging_station.region.value,),
+            )
+            row = cursor.fetchone()
+            if row is None:
+                raise ValueError(f"지역을 찾을 수 없습니다: {charging_station.region.value}")
+            region_id = row[0]
+
+            city_id = None
+            if charging_station.city:
+                cursor.execute(
+                    "SELECT id FROM city WHERE name = %s AND region_id = %s",
+                    (charging_station.city, region_id),
+                )
+                row = cursor.fetchone()
+                if row:
+                    city_id = row[0]
+
+            charging_type_id = None
+            if charging_station.charging_type:
+                cursor.execute(
+                    "SELECT id FROM charging_type WHERE name = %s",
+                    (charging_station.charging_type,),
+                )
+                row = cursor.fetchone()
+                if row:
+                    charging_type_id = row[0]
+
+            cursor.execute(
+                """
+                INSERT INTO charging_station (
+                    name, region_id, city_id, address,
+                    latitude, longitude, contact,
+                    start_time, close_time, charging_type_id
+                )
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                """,
+                (
+                    charging_station.name,
+                    region_id,
+                    city_id,
+                    getattr(charging_station, "address", None),
+                    charging_station.latitude,
+                    charging_station.longitude,
+                    charging_station.contact,
+                    charging_station.start_time,
+                    charging_station.close_time,
+                    charging_type_id,
+                ),
+            )
+            conn.commit()
+        finally:
+            cursor.close()
+
+    def find_repair_shop(self, region: Region) -> list:
+        """지역별 정비소 목록을 조회한다."""
+        conn = self.get_connection()
+        cursor = conn.cursor(dictionary=True)
+        try:
+            cursor.execute(
+                "SELECT * FROM v_repair_shop_map WHERE region_name = %s",
+                (region.value,),
+            )
+            rows = cursor.fetchall()
+            result = []
+            for row in rows:
+                rs = RepairShop()
+                rs.name = row["name"]
+                rs.region = region
+                rs.city = row["city_name"] or ""
+                rs.latitude = row["latitude"]
+                rs.longitude = row["longitude"]
+                rs.available_time = f"{row['start_time']} - {row['close_time']}"
+                rs.contact = row["contact"] or ""
+                rs.repair_shop_type = row["repair_shop_type_name"] or ""
+                result.append(rs)
+            return result
+        finally:
+            cursor.close()
+
+    def create_repair_shop(self, repair_shop) -> None:
+        """정비소 정보를 DB에 저장한다."""
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        try:
+            cursor.execute(
+                "SELECT id FROM region WHERE name = %s",
+                (repair_shop.region.value,),
+            )
+            row = cursor.fetchone()
+            if row is None:
+                raise ValueError(f"지역을 찾을 수 없습니다: {repair_shop.region.value}")
+            region_id = row[0]
+
+            city_id = None
+            if repair_shop.city:
+                cursor.execute(
+                    "SELECT id FROM city WHERE name = %s AND region_id = %s",
+                    (repair_shop.city, region_id),
+                )
+                row = cursor.fetchone()
+                if row:
+                    city_id = row[0]
+
+            repair_shop_type_id = None
+            if repair_shop.repair_shop_type:
+                cursor.execute(
+                    "SELECT id FROM repair_shop_type WHERE name = %s",
+                    (repair_shop.repair_shop_type,),
+                )
+                row = cursor.fetchone()
+                if row:
+                    repair_shop_type_id = row[0]
+
+            cursor.execute(
+                """
+                INSERT INTO repair_shop (
+                    name, region_id, city_id, address,
+                    latitude, longitude, contact,
+                    start_time, close_time, repair_shop_type_id
+                )
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                """,
+                (
+                    repair_shop.name,
+                    region_id,
+                    city_id,
+                    getattr(repair_shop, "address", None),
+                    repair_shop.latitude,
+                    repair_shop.longitude,
+                    repair_shop.contact,
+                    repair_shop.start_time,
+                    repair_shop.close_time,
+                    repair_shop_type_id,
+                ),
+            )
+            conn.commit()
+        finally:
+            cursor.close()
 
     def find_adoption_rate_by_region(self, region: Region) -> RegionEVStats:
         """지역별 전기차 보급률 통계를 조회한다."""

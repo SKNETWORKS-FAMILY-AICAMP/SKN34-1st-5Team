@@ -9,14 +9,14 @@ class ChargingType(Enum):
     대신 이 Enum을 사용하여 오타나 표기 불일치를 방지한다.
     """
 
-    AC_SINGLE_PHASE_5_PIN = "AC 단상 5핀"
-    """AC 단상 5핀 충전"""
+    AC_SINGLE_PHASE_5_PIN = "AC_단상_5핀"
+    """AC_단상_5핀_충전"""
 
-    DC_COMBO_1 = "DC 콤보 1"
-    """DC 콤보 1 충전"""
+    DC_COMBO_1 = "DC_콤보_1"
+    """DC_콤보_1_충전"""
 
     CHADEMO = "차데모"
     """차데모 충전"""
 
-    AC_THREE_PHASE_7_PIN = "AC 3상 7핀"
-    """AC 3상 7핀 충전"""
+    AC_THREE_PHASE_7_PIN = "AC_3상_7핀"
+    """AC_3상_7핀_충전"""
