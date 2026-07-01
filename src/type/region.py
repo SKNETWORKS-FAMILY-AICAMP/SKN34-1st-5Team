@@ -8,10 +8,7 @@ class Region(Enum):
         
         차종 정보, FAQ 등 지역별 데이터를 다룰 때 문자열을 직접 사용하는
         대신 이 Enum을 사용하여 오타나 표기 불일치를 방지한다.
-        
-        Attributes:
-            SEOUL: 서울을 나타내는 값.
-            BUSAN: 부산을 나타내는 값.
+       
         """
 
         SEOUL = "서울"
