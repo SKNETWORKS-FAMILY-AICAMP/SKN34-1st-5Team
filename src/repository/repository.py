@@ -98,8 +98,13 @@ class Repository:
             )
             row = cursor.fetchone()
             if row is None:
-                raise ValueError(f"제조사를 찾을 수 없습니다: {faqitem.manufacturer.value}")
-            manufacturer_id = row[0]
+                cursor.execute(
+                    "INSERT INTO manufacturer (name) VALUES (%s)",
+                    (faqitem.manufacturer.value,),
+                )
+                manufacturer_id = cursor.lastrowid
+            else:
+                manufacturer_id = row[0]
 
             cursor.execute(
                 "SELECT id FROM faq_category WHERE category = %s",
