@@ -7,6 +7,7 @@ from src.repository.repository import Repository
 from src.type.electric_vehicle import ElectricVehicle
 from src.type.region import Region
 from src.type.subsidy import Subsidy
+from src.util.region_mapper import str_to_region
 
 
 def get_subsidy(region: Region, vehicle: ElectricVehicle) -> Subsidy | None:
@@ -43,18 +44,30 @@ def set_subsidy(file_path: str) -> None:
 
     db = Repository()
 
+    vehicles: list[ElectricVehicle] = db.find_all_vehicle()
+
     with open(file_path, encoding="utf-8-sig") as csv_file:
         reader = csv.DictReader(csv_file)
 
         for row in reader:
-            subsidy = Subsidy(
-                region=Region(row["region"]),
-                manufacturer=row["manufacturer"],
-                model_name=row["model_name"],
-                trim_name=row["trim_name"],
-                national_subsidy=int(row["national_subsidy"]),
-                local_subsidy=int(row["local_subsidy"]),
-                conversion_subsidy=int(row["conversion_subsidy"]),
-            )
+            electric_vehicle: ElectricVehicle | None = None
 
+            for vehicle in vehicles:
+                if vehicle.model_name == row["모델명"]:
+                    electric_vehicle = vehicle
+                    break
+
+            if electric_vehicle is None:
+                print(f"차량 없음 - 건너뜀: {row['제조사']} / {row['모델명']}")
+                continue
+
+            subsidy = Subsidy(
+                year=int(row["연도"]),
+                region=str_to_region(row["지역"]),
+                electric_vehicle=electric_vehicle,
+                national_subsidy=int(row["국비"]),
+                local_subsidy=int(row["지방비"]),
+                national_conversion_subsidy=int(row["전환지원금_국비"]),
+                local_conversion_subsidy=int(row["전환지원금_지방비"]),
+            )
             db.create_subsidy(subsidy=subsidy)
