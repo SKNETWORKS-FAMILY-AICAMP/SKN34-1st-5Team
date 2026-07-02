@@ -100,8 +100,7 @@ SELECT
     cs.longitude,
     ct.name AS charging_type_name,
     cs.contact,
-    cs.start_time,
-    cs.close_time
+    cs.available_time
 FROM      charging_station AS cs
 JOIN      region           AS r  ON cs.region_id        = r.id
 LEFT JOIN city             AS c  ON cs.city_id          = c.id
@@ -121,8 +120,7 @@ SELECT
     rs.longitude,
     rst.name AS repair_shop_type_name,
     rs.contact,
-    rs.start_time,
-    rs.close_time
+    rs.available_time
 FROM      repair_shop      AS rs
 JOIN      region           AS r   ON rs.region_id           = r.id
 LEFT JOIN city             AS c   ON rs.city_id             = c.id

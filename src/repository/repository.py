@@ -394,7 +394,7 @@ class Repository:
                 cs.city = row["city_name"] or ""
                 cs.latitude = row["latitude"]
                 cs.longitude = row["longitude"]
-                cs.available_time = f"{row['start_time']} - {row['close_time']}"
+                cs.available_time = row["available_time"] or ""
                 cs.contact = row["contact"] or ""
                 cs.charging_type = row["charging_type_name"] or ""
                 result.append(cs)
@@ -441,9 +441,9 @@ class Repository:
                 INSERT INTO charging_station (
                     name, region_id, city_id, address,
                     latitude, longitude, contact,
-                    start_time, close_time, charging_type_id
+                    available_time, charging_type_id
                 )
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """,
                 (
                     charging_station.name,
@@ -453,8 +453,7 @@ class Repository:
                     charging_station.latitude,
                     charging_station.longitude,
                     charging_station.contact,
-                    charging_station.start_time,
-                    charging_station.close_time,
+                    charging_station.available_time,
                     charging_type_id,
                 ),
             )
@@ -480,7 +479,7 @@ class Repository:
                 rs.city = row["city_name"] or ""
                 rs.latitude = row["latitude"]
                 rs.longitude = row["longitude"]
-                rs.available_time = f"{row['start_time']} - {row['close_time']}"
+                rs.available_time = row["available_time"] or ""
                 rs.contact = row["contact"] or ""
                 rs.repair_shop_type = row["repair_shop_type_name"] or ""
                 result.append(rs)
@@ -527,9 +526,9 @@ class Repository:
                 INSERT INTO repair_shop (
                     name, region_id, city_id, address,
                     latitude, longitude, contact,
-                    start_time, close_time, repair_shop_type_id
+                    available_time, repair_shop_type_id
                 )
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """,
                 (
                     repair_shop.name,
@@ -539,8 +538,7 @@ class Repository:
                     repair_shop.latitude,
                     repair_shop.longitude,
                     repair_shop.contact,
-                    repair_shop.start_time,
-                    repair_shop.close_time,
+                    repair_shop.available_time,
                     repair_shop_type_id,
                 ),
             )
