@@ -8,6 +8,18 @@ from src.type.page import Page
 from src.repository.repository import Repository
 
 
+# 제조사 표기 -> Manufacturer Enum 값("현대", "기아") 매핑
+# 매핑 파일 확인해보고 교체
+MANUFATURER_NAME_MAP = {
+    "현대자동차":"현대",
+    "기아자동차":"기아",
+}
+
+def map_manufacturer_name(raw_name: str) -> str:
+    return MANUFATURER_NAME_MAP.get(raw_name, raw_name)
+
+
+
 def get_faq(page: int, size: int, manufacturer: Manufacturer) -> Page:
     """
     Args:
@@ -27,6 +39,7 @@ def get_faq(page: int, size: int, manufacturer: Manufacturer) -> Page:
     
 
     faq_items: list[FAQItem] = db.find_faq(category=category, sub_category=sub_category)
+
 
     total_count = len(faq_items)
     total_page = (total_count + size -1) // size if size > 0 else 0
@@ -50,16 +63,22 @@ def set_faq(file_path: str) -> None:
         없음.
     """
 
+    db = Repository()
 
     with open(file_path, encoding="utf-8-sig") as csv_file:
         reader = csv.DictReader(csv_file)
 
         for row in reader:
+            raw_company = row["company"]
+            manufacturer_name = MANUFATURER_NAME_MAP.get(raw_company, raw_company)
+
             faq_item = FAQItem(
-                manufacturer=Manufacturer(row["manufacturer"]),
+                manufacturer=Manufacturer(manufacturer_name),
                 category=row["category"],
                 question=row["question"],
                 answer=row["answer"],
                 source_url=row["source_url"],
             )
-            create_faq(faqitem=faq_item)
+            db.create_faq(faq_item)
+
+
