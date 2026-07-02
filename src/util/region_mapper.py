@@ -16,7 +16,7 @@ REGION_NAME_TO_ENUM: dict[str, Region] = {
     "강원특별자치도": Region.GANGWON,
     "충청북도": Region.CHUNGBUK,
     "충청남도": Region.CHUNGNAM,
-    "전라북도": Region.JEONBUK,
+    "전북특별자치도": Region.JEONBUK,
     "전라남도": Region.JEONNAM,
     "경상북도": Region.GYEONGBUK,
     "경상남도": Region.GYEONGNAM,
