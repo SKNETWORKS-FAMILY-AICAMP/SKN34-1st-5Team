@@ -1,30 +1,60 @@
-"""Subsidy 서비스 클래스 생성"""
+"""보조금 서비스"""
 
 import csv
+import os
 
-from src.type.region import Region
-from src.type.electric_vehicle import ElectricVehicle
-from src.type.subsidy import Subsidy
 from src.repository.repository import Repository
+from src.type.electric_vehicle import ElectricVehicle
+from src.type.region import Region
+from src.type.subsidy import Subsidy
 
 
-def get_subsidy(
-    
-    region: Region,
-    electric_vehicle: ElectricVehicle
-    ) -> Subsidy:
+def get_subsidy(region: Region, vehicle: ElectricVehicle) -> Subsidy | None:
     """
-    지역과 전기차 정보를 기준으로 보조금 정보를 조회한다.
+    Args:
+        region: 보조금을 조회할 지역 정보
+        vehicle: 보조금을 조회할 전기차 차량 정보
+
+    Returns:
+        지역과 차량 기준으로 조회된 Subsidy 객체
     """
-    subsidy = Repository.find_subsidy_by_region_and_vehicle(
-        region,
-        electric_vehicle
+
+    db = Repository()
+
+    subsidy: Subsidy | None = db.find_subsidy(
+        region=region,
+        vehicle=vehicle
     )
 
     return subsidy
 
+
 def set_subsidy(file_path: str) -> None:
     """
-    파일 경로를 받아 보조금 데이터를 등록한다.
+    Args:
+        file_path: 적재할 보조금 CSV 파일 경로
+
+    Returns:
+        없음
     """
-    Repository.save_subsidy_from_file(file_path)
+
+    if not os.path.exists(file_path):
+        raise FileNotFoundError(f"CSV 파일을 찾을 수 없습니다: {file_path}")
+
+    db = Repository()
+
+    with open(file_path, encoding="utf-8-sig") as csv_file:
+        reader = csv.DictReader(csv_file)
+
+        for row in reader:
+            subsidy = Subsidy(
+                region=Region(row["region"]),
+                manufacturer=row["manufacturer"],
+                model_name=row["model_name"],
+                trim_name=row["trim_name"],
+                national_subsidy=int(row["national_subsidy"]),
+                local_subsidy=int(row["local_subsidy"]),
+                conversion_subsidy=int(row["conversion_subsidy"]),
+            )
+
+            db.create_subsidy(subsidy=subsidy)
