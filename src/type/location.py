@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from region import Region
+
 @dataclass
 class Location:
     """이름, 지역, 시/군/구, 주소, 위도, 경도, 이용 가능 시간,
@@ -18,7 +20,7 @@ class Location:
     """
     name: str
     '''이름 정보가 담긴 항목'''
-    region: Reigon
+    region: Region
     '''지역 정보가 담긴 항목'''
     city: str
     '''시/군/구 정보가 담긴 항목'''
