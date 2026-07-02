@@ -87,6 +87,20 @@ class Repository:
         finally:
             cursor.close()
 
+    def find_category(self, manufacturer: Manufacturer) -> list[str]:
+        """제조사의 FAQ에 실제로 쓰인 카테고리 목록을 조회한다."""
+        conn = self.get_connection()
+        cursor = conn.cursor(dictionary=True)
+        try:
+            cursor.execute(
+                "SELECT DISTINCT faq_category FROM v_faq_full "
+                "WHERE manufacturer_name = %s AND faq_category IS NOT NULL",
+                (manufacturer.value,),
+            )
+            return [row["faq_category"] for row in cursor.fetchall()]
+        finally:
+            cursor.close()
+
     def create_faq(self, faqitem: FAQItem) -> None:
         """FAQ 항목을 DB에 저장한다.
 
