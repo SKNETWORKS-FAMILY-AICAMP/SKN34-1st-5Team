@@ -6,7 +6,7 @@ import mysql.connector
 from dotenv import load_dotenv
 from mysql.connector.connection import MySQLConnection
 
-from src.type.charging_station import ChargingStation
+from src.type.location import Location
 from src.type.charging_type import ChargingType
 from src.type.electric_vehicle import ElectricVehicle
 from src.type.faq_item import FAQItem
@@ -244,8 +244,13 @@ class Repository:
             )
             row = cursor.fetchone()
             if row is None:
-                raise ValueError(f"제조사를 찾을 수 없습니다: {vehicle.manufacturer.value}")
-            manufacturer_id = row[0]
+                cursor.execute(
+                    "INSERT INTO manufacturer (name) VALUES (%s)",
+                    (vehicle.manufacturer.value,),
+                )
+                manufacturer_id = cursor.lastrowid
+            else:
+                manufacturer_id = row[0]
 
             cursor.execute(
                 "SELECT id FROM charging_type WHERE name = %s",
@@ -282,6 +287,16 @@ class Repository:
                 ),
             )
             conn.commit()
+        finally:
+            cursor.close()
+
+    def find_manufacturer(self) -> list[Manufacturer]:
+        """전체 제조사 목록을 조회한다."""
+        conn = self.get_connection()
+        cursor = conn.cursor(dictionary=True)
+        try:
+            cursor.execute("SELECT name FROM manufacturer")
+            return [Manufacturer(row["name"]) for row in cursor.fetchall()]
         finally:
             cursor.close()
 
@@ -356,7 +371,7 @@ class Repository:
         """지역별 인구수 통계를 조회한다."""
         pass
 
-    def find_charging_station(self, region: Region, city: str) -> list[ChargingStation]:
+    def find_charging_station(self, region: Region, city: str) -> list[Location]:
         """지역과 도시로 충전소 목록을 조회한다."""
         conn = self.get_connection()
         cursor = conn.cursor(dictionary=True)
@@ -368,7 +383,7 @@ class Repository:
             rows = cursor.fetchall()
             result = []
             for row in rows:
-                cs = ChargingStation()
+                cs = Location()
                 cs.name = row["name"]
                 cs.region = region
                 cs.city = row["city_name"] or ""
