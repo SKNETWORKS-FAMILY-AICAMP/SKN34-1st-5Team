@@ -73,6 +73,6 @@ def get_manufacturer() -> list[Manufacturer]:
 
     db = Repository()
 
-    manufacturers: list[Manufacturer] = db.find_all_manufacturers()
+    manufacturers: list[Manufacturer] = db.find_manufacturer()
 
     return manufacturers
