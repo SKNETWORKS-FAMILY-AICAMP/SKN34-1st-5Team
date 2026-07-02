@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from region import Region
+from src.type.region import Region
 
 @dataclass
 class Location:
