@@ -66,8 +66,8 @@ def _sample_subsidy(region: Region, vehicle: ElectricVehicle) -> Subsidy:
         electric_vehicle=vehicle,
         national_subsidy=650,
         local_subsidy=200,
-        national_conversion_subsidy=0,
-        local_conversion_subsidy=0,
+        national_conversion_subsidy=100,
+        local_conversion_subsidy=50,
     )
 
 
@@ -208,7 +208,7 @@ with left_col:
             )
         ice_annual_cost = (annual_mileage / fuel_efficiency) * fuel_price
         with ice_cost_col:
-            st.metric("연간 유류비", f"{ice_annual_cost:,.0f}원")
+            st.markdown(f"연간 유류비  \n**{ice_annual_cost:,.0f}원**")
 
         st.markdown("⚡ **전기차**")
         electricity_price_col, ev_efficiency_col, ev_cost_col = st.columns(3)
@@ -225,7 +225,7 @@ with left_col:
             )
         ev_annual_cost = (annual_mileage / ev_efficiency) * electricity_price
         with ev_cost_col:
-            st.metric("연간 전기료", f"{ev_annual_cost:,.0f}원")
+            st.markdown(f"연간 전기료  \n**{ev_annual_cost:,.0f}원**")
 
         total_savings = (ice_annual_cost - ev_annual_cost) * driving_years
 
@@ -253,9 +253,19 @@ with right_col:
             subsidy = _sample_subsidy(selected_region, selected_vehicle)
             _sample_badge()
 
-        st.markdown(f"**국고 보조금**: {subsidy.national_subsidy:,}만원")
-        st.markdown(f"**지방 보조금**: {subsidy.local_subsidy:,}만원")
-        st.markdown(f"**보조금 합계**: {subsidy.get_total_support_amount():,}만원")
+        national_col, local_col = st.columns(2)
+        with national_col:
+            st.markdown(f"국고 보조금: **{subsidy.national_subsidy:,}만원**")
+        with local_col:
+            st.markdown(f"지방 보조금: **{subsidy.local_subsidy:,}만원**")
+
+        national_conversion_col, local_conversion_col = st.columns(2)
+        with national_conversion_col:
+            st.markdown(f"국고 전환 보조금: **{subsidy.national_conversion_subsidy:,}만원**")
+        with local_conversion_col:
+            st.markdown(f"지방 전환 보조금: **{subsidy.local_conversion_subsidy:,}만원**")
+
+        st.markdown(f"보조금 합계: **{subsidy.get_total_support_amount():,}만원**")
 
     with st.container(border=True):
         st.subheader("예상 구매 가격")
