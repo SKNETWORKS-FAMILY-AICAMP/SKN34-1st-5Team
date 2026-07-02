@@ -50,12 +50,12 @@ class Repository:
             )
         return self.connection
 
-    def find_faq(self, category: str, sub_category: int) -> list[FAQItem]:
-        """제조사명으로 FAQ 목록을 조회한다.
+    def find_faq(self, category: str | None, manufacturer: Manufacturer) -> list[FAQItem]:
+        """제조사와 카테고리로 FAQ 목록을 조회한다.
 
         Args:
-            category: 조회할 제조사명 (Manufacturer.value).
-            sub_category: 페이지 번호 (현재 DB 필터링에는 사용하지 않음).
+            category: 조회할 FAQ 카테고리명. None이면 카테고리 조건 없이 전체 조회한다.
+            manufacturer: 조회할 제조사.
 
         Returns:
             조건에 맞는 FAQItem 목록.
@@ -63,10 +63,16 @@ class Repository:
         conn = self.get_connection()
         cursor = conn.cursor(dictionary=True)
         try:
-            cursor.execute(
-                "SELECT * FROM v_faq_full WHERE manufacturer_name = %s",
-                (category,),
-            )
+            if category is None:
+                cursor.execute(
+                    "SELECT * FROM v_faq_full WHERE manufacturer_name = %s",
+                    (manufacturer.value,),
+                )
+            else:
+                cursor.execute(
+                    "SELECT * FROM v_faq_full WHERE manufacturer_name = %s AND faq_category = %s",
+                    (manufacturer.value, category),
+                )
             rows = cursor.fetchall()
             return [
                 FAQItem(
