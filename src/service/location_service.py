@@ -133,16 +133,16 @@ def set_repair_shop_by_region(self, file_path: str) -> None:
 
 # 시/군/구 정보 리스트로 얻기
 
-def get_city(region: Region) -> list:
+def get_city(region: Region) -> list[str]:
     '''
     시/군/구 정보 리스트로 얻는 함수
     Args:
         region: 조회할 지역
     '''
-    
+
     db = Repository()
 
-    gc: list[Location] = db.find_city(region)
+    gc: list[str] = db.find_city(region)
 
     return gc
 

@@ -395,17 +395,17 @@ class Repository:
         finally:
             cursor.close()
 
-    def find_city(self, region: Region, city: str) -> str | None:
-        """시도와 시/군/구명으로 도시를 조회한다."""
+    def find_city(self, region: Region) -> list[str]:
+        """지역(시/도)에 속한 시/군/구 이름 목록을 조회한다."""
         conn = self.get_connection()
         cursor = conn.cursor(dictionary=True)
         try:
             cursor.execute(
-                "SELECT city_name FROM v_city_by_region WHERE region_name = %s AND city_name = %s",
-                (region.value, city),
+                "SELECT city_name FROM v_city_by_region WHERE region_name = %s",
+                (region.value,),
             )
-            row = cursor.fetchone()
-            return row["city_name"] if row else None
+            rows = cursor.fetchall()
+            return [row["city_name"] for row in rows]
         finally:
             cursor.close()
 
