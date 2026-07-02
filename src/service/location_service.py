@@ -13,6 +13,7 @@ from src.repository.repository import Repository
 
 def get_charging_station_by_region(region:Region, city:str, page:int, size: int) -> Page:
     '''
+    전기차 충전소 위치를 DB에서 조회해서 값을 반환하는 함수
     Args:
      region: 조회할 지역
      city: 조회할 시/군/구
@@ -42,10 +43,18 @@ def get_charging_station_by_region(region:Region, city:str, page:int, size: int)
 # 정비소 위치 조회 
 
 def get_repair_shop_by_region(region: Region, city: str, page:int, size:int) -> Page:
+    '''
+    정비소 위치를 DB에서 조회해서 값을 반환하는 함수
+    Args:
+     region: 조회할 지역
+     city: 조회할 시/군/구
+     page: 조회할 페이지 번호
+     size: 한 페이지에서 가져올 충전소 목록
+    '''
     
     db = Repository()
 
-    rps: list[Location] = db.find_repair_shop(region, city)
+    rps: list[RepairShop] = db.find_repair_shop(region, city)
     total_count = len(rps)
     total_page = (total_count + size -1) // size if size > 0 else 0
     start = (page -1) * size
@@ -62,6 +71,7 @@ def get_repair_shop_by_region(region: Region, city: str, page:int, size:int) -> 
 
 def set_charging_station_by_region(self, file_path: str) -> None:
     '''
+    충전소 위치 파일을 읽고 DB에 저장하는 함수
     Args:
         file_path:적재할 csv파일 경로
     '''
@@ -93,6 +103,7 @@ def set_charging_station_by_region(self, file_path: str) -> None:
 
 def set_repair_shop_by_region(self, file_path: str) -> None:
     '''
+    정비소 위치 파일을 읽고 DB에 저장하는 함수
     Args:
         file_path: 적재할 csv파일 경로
     '''
@@ -123,6 +134,11 @@ def set_repair_shop_by_region(self, file_path: str) -> None:
 # 시/군/구 정보 리스트로 얻기
 
 def get_city(region: Region) -> list:
+    '''
+    시/군/구 정보 리스트로 얻는 함수
+    Args:
+        region: 조회할 지역
+    '''
     
     db = Repository()
 
