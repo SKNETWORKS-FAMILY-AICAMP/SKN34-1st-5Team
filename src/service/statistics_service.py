@@ -6,7 +6,7 @@ import os
 
 from src.repository.repository import Repository
 from src.type.region import Region
-from src.type.region_ev_stats import RegionEVStats
+from src.type.region_EV_stats import RegionEVStats
 
 
 

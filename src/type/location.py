@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from dataclasses import dataclass
 
 @dataclass
@@ -30,4 +32,3 @@ class Location:
     '''이용 가능 시간 정보가 담긴 항목'''
     contact: str
     '''연락처 정보가 담긴 항목'''
-
