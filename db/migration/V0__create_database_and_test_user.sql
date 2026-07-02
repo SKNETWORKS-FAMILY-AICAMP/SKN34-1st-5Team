@@ -1,3 +1,4 @@
+-- transactional: false
 -- Initial database and test user setup
 -- Run this before V1__create_tables.sql with a MySQL account that can create databases and users.
 

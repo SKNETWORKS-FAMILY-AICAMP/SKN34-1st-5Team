@@ -293,6 +293,6 @@ def run() -> None:
 
 
 if __name__ == "__main__":
-    # bootstrap_database()
+    bootstrap_database()
     run()
 

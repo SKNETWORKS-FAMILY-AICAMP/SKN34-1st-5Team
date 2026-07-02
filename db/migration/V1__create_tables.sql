@@ -1,3 +1,4 @@
+-- transactional: false
 -- EV Purchase Support Information System DB Schema
 
 -- Lookup Tables

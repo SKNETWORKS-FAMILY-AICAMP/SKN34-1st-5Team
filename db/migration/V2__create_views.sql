@@ -1,3 +1,4 @@
+-- transactional: false
 -- EV Purchase Support Information System View Definitions
 
 -- 1. Electric Vehicle Detail
