@@ -18,3 +18,6 @@ class Manufacturer(Enum):
 
     KIA = "기아"
     """기아"""
+
+    GENESIS = "제네시스"
+    """제네시스"""
