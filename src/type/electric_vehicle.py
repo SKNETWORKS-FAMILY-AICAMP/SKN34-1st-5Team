@@ -5,14 +5,14 @@ class ElectricVehicle:
 
     def __init__(
             self,
-            manufacturer: Manufacturer,
             model_name: str,
             trim_name: str,
-            price: int,
-            driving_range: int,
-            efficiency: float,
-            slow_charging_type: ChargingType,
-            fast_charging_type: ChargingType
+            manufacturer: Manufacturer = None,
+            price: int = None,
+            driving_range: int = None,
+            efficiency: float = None,
+            slow_charging_type: ChargingType = None,
+            fast_charging_type: ChargingType = None
             ):
         self.manufacturer: Manufacturer = manufacturer
         self.model_name: str = model_name
