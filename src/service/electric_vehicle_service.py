@@ -39,7 +39,7 @@ def get_by_vehicle(
 
     db = Repository()
 
-    vehicle: ElectricVehicle | None = db.find_all_vehicle(
+    vehicle: ElectricVehicle | None = db.find_vehicle(
         model_name=model_name,
         trim_name=trim_name
     )
@@ -73,6 +73,6 @@ def get_manufacturer() -> list[Manufacturer]:
 
     db = Repository()
 
-    manufacturers: list[Manufacturer] = db.find_all_manufacturers()
+    manufacturers: list[Manufacturer] = db.find_manufacturer()
 
     return manufacturers
