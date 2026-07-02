@@ -284,17 +284,15 @@ def bootstrap_database() -> None:
 
 # 시작함수
 def run() -> None:
-    try:
-        bootstrap_database()
-        st.success("DB 준비가 완료되었습니다.")
-    except Exception as error:
-        st.error("DB 초기화 또는 migration 처리 중 오류가 발생했습니다.")
-        st.exception(error)
-        return
+    dashboard = st.Page("src/pages/dashboard_page.py", title="대시보드",default=True)
+    fqa = st.Page("src/pages/faq_page.py", title="FAQ")
+    map = st.Page("src/pages/map_page.py", title="지도")
 
-    st.title("전기차 등록 · 충전 인프라 균형 분석")
-    st.write("Streamlit 화면 구성을 시작합니다.")
+    page = st.navigation([dashboard, fqa, map])
+    page.run()
 
 
 if __name__ == "__main__":
+    # bootstrap_database()
     run()
+
