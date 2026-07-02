@@ -238,6 +238,37 @@ class Repository:
         finally:
             cursor.close()
 
+    def find_vehicle(self, model_name: str, trim_name: str) -> ElectricVehicle | None:
+        """모델명과 트림명으로 개별 전기차를 조회한다."""
+        conn = self.get_connection()
+        cursor = conn.cursor(dictionary=True)
+        try:
+            cursor.execute(
+                """
+                SELECT *
+                FROM v_electric_vehicle_detail
+                WHERE model_name = %s
+                  AND trim_name = %s
+                LIMIT 1
+                """,
+                (model_name, trim_name),
+            )
+            row = cursor.fetchone()
+            if row is None:
+                return None
+            return ElectricVehicle(
+                manufacturer=Manufacturer(row["manufacturer_name"]),
+                model_name=row["model_name"],
+                trim_name=row["trim_name"],
+                price=row["price"],
+                driving_range=row["driving_range"],
+                efficiency=row["efficiency"],
+                slow_charging_type=ChargingType(row["slow_charging_type_name"]) if row["slow_charging_type_name"] else None,
+                fast_charging_type=ChargingType(row["fast_charging_type_name"]) if row["fast_charging_type_name"] else None,
+            )
+        finally:
+            cursor.close()
+
     def create_vehicle(self, vehicle: ElectricVehicle) -> None:
         """전기차 정보를 DB에 저장한다."""
         conn = self.get_connection()
@@ -369,6 +400,38 @@ class Repository:
             )
             row = cursor.fetchone()
             return row["city_name"] if row else None
+        finally:
+            cursor.close()
+
+    def create_city(self, region: Region, code: str, name: str) -> None:
+        """도시(시/군/구) 정보를 DB에 저장한다.
+
+        같은 지역에 동일한 이름의 도시가 이미 있으면 다시 추가하지 않는다.
+        """
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        try:
+            cursor.execute(
+                "SELECT id FROM region WHERE name = %s",
+                (region.value,),
+            )
+            row = cursor.fetchone()
+            if row is None:
+                raise ValueError(f"지역을 찾을 수 없습니다: {region.value}")
+            region_id = row[0]
+
+            cursor.execute(
+                "SELECT id FROM city WHERE name = %s AND region_id = %s",
+                (name, region_id),
+            )
+            if cursor.fetchone() is not None:
+                return
+
+            cursor.execute(
+                "INSERT INTO city (region_id, code, name) VALUES (%s, %s, %s)",
+                (region_id, code, name),
+            )
+            conn.commit()
         finally:
             cursor.close()
 
